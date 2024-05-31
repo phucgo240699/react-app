@@ -1,0 +1,12 @@
+.info {
+  color: white;
+  background-color: rgb(0, 60, 132);
+}
+.warning {
+  color: white;
+  background-color: rgb(95, 95, 0);
+}
+.error {
+  color: white;
+  background-color: rgb(127, 0, 0);
+}

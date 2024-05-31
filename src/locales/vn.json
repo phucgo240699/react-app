@@ -1,0 +1,43 @@
+{
+  "authentication": {
+    "signIn": {
+      "login": "Đăng nhập",
+      "email": "Email",
+      "password": "Mật khẩu",
+      "inCorrectLoginInfo": "Email hoặc mật khẩu không chính xác"
+    },
+    "signUp": {
+      "signUp": "Đăng ký",
+      "clickToSignUp": "Nhấp vào đây để đăng ký"
+    },
+    "signOut": {
+      "signOut": "Đăng xuất"
+    }
+  },
+  "profile": {
+    "myProfile": "Thông tin tài khoản"
+  },
+  "session": {
+    "loading": "Đang tải"
+  },
+  "error": {
+    "internalServerError": "Lỗi hệ thống máy chủ"
+  },
+  "backend": {
+    "authentication": {
+      "missingRefreshToken": "Thiếu refresh token",
+      "expiredAccessToken": "Access token đã hết hạn",
+      "expiredRefreshToken": "Refresh token hết hạn",
+      "signIn": {
+        "incorrectInfo": "Thông tin đăng nhập không chính xác",
+        "hasNotVerifiedEmail": "Email chưa được xác thực"
+      },
+      "signUp": {
+        "missingEmail": "Thiếu thông tin email",
+        "missingPassword": "Thiếu thông tin mật khẩu",
+        "missingName": "Thiếu thông tin tên",
+        "existedEmail": "Email đã tồn tại"
+      }
+    }
+  }
+}

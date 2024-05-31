@@ -1,25 +1,40 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import Loader from "components/Loader";
+import Toasts from "components/Toasts";
+import { PageRoutes } from "constants/routes";
+import { Suspense, lazy, useEffect } from "react";
+import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
+import { dispatch } from "store";
+import sessionSlice from "store/reducers/session";
+import { useRootSelector } from "store/selectors";
+
+const HomePage = lazy(() => import("pages/home"));
+const SignInPage = lazy(() => import("pages/signIn"));
 
 function App() {
+  const selectors = useRootSelector();
+  useEffect(() => {
+    dispatch(sessionSlice.actions.hideLoading());
+  }, []);
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <BrowserRouter>
+      <Suspense fallback={<Loader />}>
+        <Routes>
+          <Route
+            path={PageRoutes.Home}
+            element={
+              selectors.authentication.isAuthenticated ? (
+                <HomePage />
+              ) : (
+                <Navigate to={PageRoutes.SignIn} />
+              )
+            }
+          />
+          <Route path={PageRoutes.SignIn} element={<SignInPage />} />
+        </Routes>
+      </Suspense>
+      {selectors.session.loading && <Loader />}
+      <Toasts toasts={selectors.session.toasts} />
+    </BrowserRouter>
   );
 }
 
