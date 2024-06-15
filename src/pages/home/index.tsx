@@ -1,4 +1,4 @@
-import withAllPosts from "hoc/posts";
+import withAllPosts from "hocs/posts";
 import PostsList from "components/PostsLists";
 
 const HomePage = () => {
