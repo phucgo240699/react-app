@@ -1,14 +1,15 @@
-import { postRequest } from "../config";
+import { postRequest } from "services";
+
+export interface SignInRequest {
+  email: string;
+  password: string;
+}
 
 export const signIn = async ({
   email,
   password,
-}: {
-  email: string;
-  password: string;
-}): Promise<boolean> => {
+}: SignInRequest): Promise<boolean> => {
   await postRequest({
-    loading: true,
     url: "/users/signIn",
     body: { email, password },
   });

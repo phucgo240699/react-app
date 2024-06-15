@@ -7,7 +7,7 @@ interface WrappedComponentProps {
 }
 
 const withAllPosts = (WrappedComponent: React.FC<WrappedComponentProps>) => {
-  const WrappedComponentWithAllProducts = () => {
+  const WrappedComponentWithAllPosts = () => {
     const [posts, setPosts] = useState<Post[]>([]);
 
     useEffect(() => {
@@ -18,7 +18,7 @@ const withAllPosts = (WrappedComponent: React.FC<WrappedComponentProps>) => {
     }, []);
     return <WrappedComponent posts={posts} />;
   };
-  return WrappedComponentWithAllProducts;
+  return WrappedComponentWithAllPosts;
 };
 
 export default withAllPosts;

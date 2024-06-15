@@ -1,7 +1,5 @@
 export enum PageRoutes {
   Home = "/",
-  Products = "/products",
-  Profile = "/profile",
+  Posts = "/posts",
   SignIn = "/sign-in",
-  SignUp = "/sign-up",
 }

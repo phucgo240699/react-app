@@ -23,9 +23,48 @@ const sessionSlice = createSlice({
     hideLoading(state) {
       state.loading = false;
     },
+    addInfoToast(state, action: PayloadAction<string>) {
+      const toast: IToast = new InfoToast(action.payload, state.toastsAmount);
+      state.toasts.push(toast);
+      state.toastsAmount += 1;
+    },
+    addInfoToastWithTranslation(state, action: PayloadAction<string>) {
+      const toast: IToast = new InfoToast(
+        action.payload,
+        state.toastsAmount,
+        true
+      );
+      state.toasts.push(toast);
+      state.toastsAmount += 1;
+    },
+    addWarningToast(state, action: PayloadAction<string>) {
+      const toast: IToast = new WarningToast(
+        action.payload,
+        state.toastsAmount
+      );
+      state.toasts.push(toast);
+      state.toastsAmount += 1;
+    },
+    addWarningToastWithTranslation(state, action: PayloadAction<string>) {
+      const toast: IToast = new WarningToast(
+        action.payload,
+        state.toastsAmount,
+        true
+      );
+      state.toasts.push(toast);
+      state.toastsAmount += 1;
+    },
     addErrorToast(state, action: PayloadAction<string>) {
-      const toast: IToast = new ErrorToast(action.payload);
-      toast.id = state.toastsAmount;
+      const toast: IToast = new ErrorToast(action.payload, state.toastsAmount);
+      state.toasts.push(toast);
+      state.toastsAmount += 1;
+    },
+    addErrorToastWithTranslation(state, action: PayloadAction<string>) {
+      const toast: IToast = new ErrorToast(
+        action.payload,
+        state.toastsAmount,
+        true
+      );
       state.toasts.push(toast);
       state.toastsAmount += 1;
     },
@@ -37,6 +76,9 @@ const sessionSlice = createSlice({
     clearToasts(state) {
       state.toasts = [];
       state.toastsAmount = 0;
+    },
+    reset(state) {
+      state = initialState;
     },
   },
 });

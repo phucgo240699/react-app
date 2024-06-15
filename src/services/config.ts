@@ -1,153 +1,80 @@
 import axios from "axios";
-import { isNil } from "utils/index";
 import { BASE_API_URL } from "constants/index";
-import {
-  errorInterceptor,
-  requestInterceptor,
-  responseInterceptor,
-} from "./interceptors";
+import { AxiosResponse, AxiosError, InternalAxiosRequestConfig } from "axios";
+import authenticationSlice from "store/reducers/authentication";
 import { dispatch } from "store";
-import sessionSlice from "store/reducers/session";
+import { HttpStatusCode } from "constants/statusCodes";
+import { getFormatedHeaders } from "./utils";
 
 const baseAxios = axios.create({
   baseURL: BASE_API_URL,
+  headers: {
+    Accept: "application/json",
+    "Content-Type": "application/json",
+  },
   validateStatus: function (status) {
-    return status === 200 || status === 201;
+    return (
+      status === HttpStatusCode.Success ||
+      status === HttpStatusCode.ExpiredAccessToken ||
+      status === HttpStatusCode.ExpiredRefreshToken
+    );
   },
 });
+
+const responseInterceptor = async (response: AxiosResponse) => {
+  if (response.status === HttpStatusCode.Success) {
+    const url = response.config.url;
+    const accessToken: string = response.data.data?.accessToken;
+    const refreshToken: string = response.data.data?.refreshToken;
+    if (url === "/users/signIn" && accessToken != null) {
+      dispatch(authenticationSlice.actions.setIsAuthenticated(true));
+      localStorage.setItem("accessToken", accessToken);
+      localStorage.setItem("refreshToken", refreshToken);
+    }
+    return Promise.resolve(response.data?.data);
+  } else if (response.status === HttpStatusCode.ExpiredAccessToken) {
+    const refreshTokenResponse = await axios.post(
+      "/users/refreshToken",
+      {
+        refreshToken: localStorage.getItem("refreshToken"),
+      },
+      {
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+        baseURL: BASE_API_URL,
+        validateStatus: (status) =>
+          status === HttpStatusCode.Success ||
+          status === HttpStatusCode.ExpiredRefreshToken,
+      }
+    );
+    const accessToken: string = refreshTokenResponse.data.data?.accessToken;
+    const refreshToken: string = refreshTokenResponse.data.data?.refreshToken;
+    if (accessToken != null && refreshToken != null) {
+      localStorage.setItem("accessToken", accessToken);
+      localStorage.setItem("refreshToken", refreshToken);
+      const recalledResponse = await axios.request({
+        baseURL: BASE_API_URL,
+        url: response.config.url,
+        params: response.config.params,
+        data: response.data,
+        headers: getFormatedHeaders(response.headers),
+      });
+      return Promise.resolve(recalledResponse.data.data);
+    } else {
+      dispatch(authenticationSlice.actions.logout());
+      return Promise.resolve({});
+    }
+  }
+};
+
+
+const errorInterceptor = (error: AxiosError) => Promise.reject(error);
+
+const requestInterceptor = (config: InternalAxiosRequestConfig) => config;
+
 baseAxios.interceptors.request.use(requestInterceptor, errorInterceptor);
 baseAxios.interceptors.response.use(responseInterceptor, errorInterceptor);
 
-const defaultHeader = {
-  Accept: "application/json",
-  "Content-Type": "application/json",
-};
-
-const getFormatedHeaders = (headers: any) => {
-  const accessToken = headers?.accessToken;
-  if (!isNil(accessToken)) {
-    delete headers.accessToken;
-    return {
-      ...headers,
-      Authorization: `Bearer ${accessToken}`,
-    };
-  }
-  return headers;
-};
-
-const getUrlWithQueryParams = (url: string, params?: any[]) => {
-  if (params && params.length > 0) {
-    const queryParams = params.reduce((prev, cur) => {
-      const key = Object.keys(cur);
-      const value = cur.key;
-      return prev + `${key}=${value}`;
-    });
-    return `${url}?${queryParams}`;
-  }
-  return url;
-};
-
-interface IGenericRequest {
-  url: string;
-  params?: any[];
-  headers?: any;
-  loading?: boolean;
-}
-
-interface IGetRequest extends IGenericRequest {}
-interface IPostRequest extends IGenericRequest {
-  body?: any;
-}
-interface IPutRequest extends IGenericRequest {
-  body?: any;
-}
-interface IDeleteRequest extends IGenericRequest {
-  body?: any;
-}
-
-const getRequest = async ({ url, params, headers, loading }: IGetRequest) => {
-  const queryUrl = getUrlWithQueryParams(url, params);
-  if (loading) {
-    dispatch(sessionSlice.actions.showLoading());
-  }
-  const response = await baseAxios.get(queryUrl, {
-    headers: {
-      ...defaultHeader,
-      ...getFormatedHeaders(headers),
-    },
-  });
-  if (loading) {
-    dispatch(sessionSlice.actions.hideLoading());
-  }
-  return response;
-};
-
-const postRequest = async ({
-  url,
-  params,
-  body,
-  headers = {},
-  loading = false,
-}: IPostRequest) => {
-  const queryUrl = getUrlWithQueryParams(url, params);
-  if (loading) {
-    dispatch(sessionSlice.actions.showLoading());
-  }
-  const response = await baseAxios.post(queryUrl, body, {
-    headers: {
-      ...defaultHeader,
-      ...getFormatedHeaders(headers),
-    },
-  });
-  if (loading) {
-    dispatch(sessionSlice.actions.hideLoading());
-  }
-  return response;
-};
-
-const putRequest = async ({
-  url,
-  params,
-  body,
-  headers = {},
-  loading = false,
-}: IPutRequest) => {
-  const queryUrl = getUrlWithQueryParams(url, params);
-  if (loading) {
-    dispatch(sessionSlice.actions.showLoading());
-  }
-  const response = await baseAxios.put(queryUrl, body, {
-    headers: {
-      ...defaultHeader,
-      ...getFormatedHeaders(headers),
-    },
-  });
-  if (loading) {
-    dispatch(sessionSlice.actions.hideLoading());
-  }
-  return response;
-};
-
-const deleteRequest = async ({
-  url,
-  params,
-  headers = {},
-  loading = false,
-}: IDeleteRequest) => {
-  const queryUrl = getUrlWithQueryParams(url, params);
-  if (loading) {
-    dispatch(sessionSlice.actions.showLoading());
-  }
-  const response = await baseAxios.delete(queryUrl, {
-    headers: {
-      ...defaultHeader,
-      ...getFormatedHeaders(headers),
-    },
-  });
-  if (loading) {
-    dispatch(sessionSlice.actions.hideLoading());
-  }
-  return response;
-};
-
-export { getRequest, postRequest, putRequest, deleteRequest };
+export default baseAxios;
