@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { SignInRequest, signIn } from "services/signIn";
+import { signIn } from "services/signIn";
+import { SignInPayload } from "services/types/signIn";
 import { PageRoutes } from "constants/routes";
 import apiCall from "apiCall";
 
@@ -16,16 +17,12 @@ export const useSignInHook = () => {
   };
 
   const signInClickHandler = async () => {
-    try {
-      const signedIn = await apiCall<SignInRequest, boolean>({
-        loading: true,
-        request: signIn,
-        data: { email: username, password: password },
-      });
-      if (signedIn) {
-        window.location.assign(PageRoutes.Home);
-      }
-    } catch (error) {}
+    await apiCall<SignInPayload, void>({
+      loading: true,
+      request: signIn,
+      data: { email: username, password: password },
+    });
+    window.location.assign(PageRoutes.Home);
   };
 
   return {

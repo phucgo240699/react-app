@@ -1,24 +1,16 @@
-import { getFormatedHeaders, getUrlWithQueryParams } from "./utils";
-import baseAxios from "./config";
+import {
+  getFormatedHeaders,
+  getUrlWithQueryParams,
+} from "services/config/utils";
+import baseAxios from "services/config";
+import {
+  IDeleteRequestParameters,
+  IGetRequestParameters,
+  IPostRequestParameters,
+  IPutRequestParameters,
+} from "services/types";
 
-interface IGenericRequest {
-  url: string;
-  params?: any[];
-  headers?: any;
-}
-
-interface IGetRequest extends IGenericRequest {}
-interface IPostRequest extends IGenericRequest {
-  body?: any;
-}
-interface IPutRequest extends IGenericRequest {
-  body?: any;
-}
-interface IDeleteRequest extends IGenericRequest {
-  body?: any;
-}
-
-const getRequest = async ({ url, params, headers }: IGetRequest) => {
+const getRequest = async ({ url, params, headers }: IGetRequestParameters) => {
   const queryUrl = getUrlWithQueryParams(url, params);
   const response = await baseAxios.get(queryUrl, {
     headers: {
@@ -33,7 +25,7 @@ const postRequest = async ({
   params,
   body,
   headers = {},
-}: IPostRequest) => {
+}: IPostRequestParameters) => {
   const queryUrl = getUrlWithQueryParams(url, params);
   const response = await baseAxios.post(queryUrl, body, {
     headers: {
@@ -43,7 +35,12 @@ const postRequest = async ({
   return response;
 };
 
-const putRequest = async ({ url, params, body, headers = {} }: IPutRequest) => {
+const putRequest = async ({
+  url,
+  params,
+  body,
+  headers = {},
+}: IPutRequestParameters) => {
   const queryUrl = getUrlWithQueryParams(url, params);
   const response = await baseAxios.put(queryUrl, body, {
     headers: {
@@ -53,7 +50,11 @@ const putRequest = async ({ url, params, body, headers = {} }: IPutRequest) => {
   return response;
 };
 
-const deleteRequest = async ({ url, params, headers = {} }: IDeleteRequest) => {
+const deleteRequest = async ({
+  url,
+  params,
+  headers = {},
+}: IDeleteRequestParameters) => {
   const queryUrl = getUrlWithQueryParams(url, params);
   const response = await baseAxios.delete(queryUrl, {
     headers: {

@@ -21,7 +21,8 @@
     "loading": "Loading"
   },
   "error": {
-    "internalServerError": "Internal server error"
+    "internalServerError": "Internal server error",
+    "somethingWentWrong": "Something went wrong."
   },
   "backend": {
     "authentication": {

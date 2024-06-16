@@ -3,7 +3,7 @@ import { BASE_API_URL } from "constants/index";
 import { AxiosResponse, AxiosError, InternalAxiosRequestConfig } from "axios";
 import authenticationSlice from "store/reducers/authentication";
 import { dispatch } from "store";
-import { HttpStatusCode } from "constants/statusCodes";
+import { RequestStatusCode } from "constants/statusCodes";
 import { getFormatedHeaders } from "./utils";
 
 const baseAxios = axios.create({
@@ -14,15 +14,15 @@ const baseAxios = axios.create({
   },
   validateStatus: function (status) {
     return (
-      status === HttpStatusCode.Success ||
-      status === HttpStatusCode.ExpiredAccessToken ||
-      status === HttpStatusCode.ExpiredRefreshToken
+      status === RequestStatusCode.Success ||
+      status === RequestStatusCode.ExpiredAccessToken ||
+      status === RequestStatusCode.ExpiredRefreshToken
     );
   },
 });
 
 const responseInterceptor = async (response: AxiosResponse) => {
-  if (response.status === HttpStatusCode.Success) {
+  if (response.status === RequestStatusCode.Success) {
     const url = response.config.url;
     const accessToken: string = response.data.data?.accessToken;
     const refreshToken: string = response.data.data?.refreshToken;
@@ -32,7 +32,7 @@ const responseInterceptor = async (response: AxiosResponse) => {
       localStorage.setItem("refreshToken", refreshToken);
     }
     return Promise.resolve(response.data?.data);
-  } else if (response.status === HttpStatusCode.ExpiredAccessToken) {
+  } else if (response.status === RequestStatusCode.ExpiredAccessToken) {
     const refreshTokenResponse = await axios.post(
       "/users/refreshToken",
       {
@@ -45,8 +45,8 @@ const responseInterceptor = async (response: AxiosResponse) => {
         },
         baseURL: BASE_API_URL,
         validateStatus: (status) =>
-          status === HttpStatusCode.Success ||
-          status === HttpStatusCode.ExpiredRefreshToken,
+          status === RequestStatusCode.Success ||
+          status === RequestStatusCode.ExpiredRefreshToken,
       }
     );
     const accessToken: string = refreshTokenResponse.data.data?.accessToken;
@@ -68,7 +68,6 @@ const responseInterceptor = async (response: AxiosResponse) => {
     }
   }
 };
-
 
 const errorInterceptor = (error: AxiosError) => Promise.reject(error);
 

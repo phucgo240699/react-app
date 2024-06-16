@@ -1,17 +1,12 @@
 import { postRequest } from "services";
-
-export interface SignInRequest {
-  email: string;
-  password: string;
-}
+import { SignInPayload } from "services/types/signIn";
 
 export const signIn = async ({
   email,
   password,
-}: SignInRequest): Promise<boolean> => {
+}: SignInPayload): Promise<void> => {
   await postRequest({
     url: "/users/signIn",
     body: { email, password },
   });
-  return true;
 };

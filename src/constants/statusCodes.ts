@@ -1,4 +1,4 @@
-export enum HttpStatusCode {
+export enum RequestStatusCode {
   Success = 200,
   NotAcceptable = 406,
   ExpiredAccessToken = 401,

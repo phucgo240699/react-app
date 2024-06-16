@@ -21,7 +21,8 @@
     "loading": "Đang tải"
   },
   "error": {
-    "internalServerError": "Lỗi hệ thống máy chủ"
+    "internalServerError": "Lỗi hệ thống máy chủ",
+    "somethingWentWrong": "Đã có lỗi. Xin thử lại."
   },
   "backend": {
     "authentication": {
