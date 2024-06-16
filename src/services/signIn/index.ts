@@ -1,3 +1,4 @@
+import { SIGN_IN_API_PATH } from "constants/index";
 import { postRequest } from "services";
 import { SignInPayload } from "services/types/signIn";
 
@@ -6,7 +7,7 @@ export const signIn = async ({
   password,
 }: SignInPayload): Promise<void> => {
   await postRequest({
-    url: "/users/signIn",
+    url: SIGN_IN_API_PATH,
     body: { email, password },
   });
 };

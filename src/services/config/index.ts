@@ -1,5 +1,5 @@
 import axios from "axios";
-import { BASE_API_URL } from "constants/index";
+import { BASE_API_URL, SIGN_IN_API_PATH } from "constants/index";
 import { AxiosResponse, AxiosError, InternalAxiosRequestConfig } from "axios";
 import authenticationSlice from "store/reducers/authentication";
 import { dispatch } from "store";
@@ -26,7 +26,7 @@ const responseInterceptor = async (response: AxiosResponse) => {
     const url = response.config.url;
     const accessToken: string = response.data.data?.accessToken;
     const refreshToken: string = response.data.data?.refreshToken;
-    if (url === "/users/signIn" && accessToken != null) {
+    if (url === SIGN_IN_API_PATH && accessToken != null) {
       dispatch(authenticationSlice.actions.setIsAuthenticated(true));
       localStorage.setItem("accessToken", accessToken);
       localStorage.setItem("refreshToken", refreshToken);
